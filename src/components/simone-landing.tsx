@@ -137,7 +137,7 @@ export function SimOneLanding() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="max-w-3xl text-balance text-4xl font-medium leading-[1.08] tracking-tight text-white md:text-5xl lg:text-[56px]"
+                className="max-w-3xl text-balance text-4xl font-medium leading-[1.08] text-white md:text-5xl lg:text-[56px]"
               >
                 A conscious operating layer for AI-first companies.
               </motion.h1>
@@ -544,7 +544,7 @@ function FeatureCardsSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="max-w-md text-3xl font-medium leading-[1.1] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-[56px]"
+            className="max-w-md text-3xl font-medium leading-[1.1] text-white sm:text-4xl md:text-5xl lg:text-[56px]"
           >
             Made for conscious builders, not org charts.
           </motion.h2>
@@ -648,7 +648,7 @@ function PaperclipSection() {
         </div>
         <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
-            <h2 className="text-3xl font-medium leading-[1.1] tracking-tight text-white sm:text-4xl md:text-5xl">
+            <h2 className="text-3xl font-medium leading-[1.1] text-white sm:text-4xl md:text-5xl">
               Paperclip showed the pattern. SimOne changes the operating system.
             </h2>
             <p className="mt-6 leading-7 text-zinc-400">
@@ -674,23 +674,13 @@ function PaperclipSection() {
 function RagSection() {
   return (
     <section className="relative z-20 overflow-hidden bg-[#09090b] px-6 py-32">
-      <div className="pointer-events-none absolute -right-48 top-10 hidden h-[620px] w-[820px] rotate-[-14deg] overflow-hidden opacity-[0.07] grayscale lg:block" aria-hidden="true">
-        <Image
-          src="/SIM.svg"
-          alt=""
-          width={1200}
-          height={900}
-          className="h-full w-full scale-125 object-cover object-left-top"
-          unoptimized
-        />
-      </div>
       <div className="relative mx-auto max-w-5xl">
         <div className="mb-8 flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-[#7170ff]" />
           <span className="text-sm text-zinc-400">Systems Intelligence Model RAG</span>
           <ChevronRight className="h-4 w-4 text-zinc-500" aria-hidden="true" />
         </div>
-        <h2 className="max-w-3xl text-3xl font-medium leading-[1.1] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-[56px]">
+        <h2 className="max-w-3xl text-3xl font-medium leading-[1.1] text-white sm:text-4xl md:text-5xl lg:text-[56px]">
           Every agent starts from the same map of the venture.
         </h2>
         <p className="mt-6 max-w-2xl leading-7 text-zinc-400">
@@ -698,6 +688,27 @@ function RagSection() {
           Product, Customer, Cash, and Skills engines, coordinated by Innovation, Governance,
           Interaction, and Culture drivers.
         </p>
+        <div className="pointer-events-none relative z-0 mt-8 hidden h-[420px] overflow-hidden md:block lg:-mb-6 lg:h-[500px]" aria-hidden="true">
+          <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#09090b] to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#09090b] to-transparent" />
+          <div
+            className="absolute left-1/2 top-20 h-[520px] w-[925px] opacity-30 grayscale lg:top-16 lg:h-[610px] lg:w-[1085px]"
+            style={{
+              transform:
+                "translateX(-35%) perspective(1800px) rotateX(62deg) rotateZ(-26deg) scale(1.16)",
+              transformOrigin: "50% 10%",
+            }}
+          >
+            <Image
+              src="/sim-diagram.png"
+              alt=""
+              width={1920}
+              height={1080}
+              className="h-full w-full object-contain"
+              sizes="1085px"
+            />
+          </div>
+        </div>
         <div className="mt-12 grid gap-4 md:grid-cols-3">
           {ragCards.map(([title, body]) => (
             <article key={title} className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
@@ -735,7 +746,7 @@ function EngineSection() {
           <span className="text-sm text-zinc-400">The operating replacement for CEO/CMO/CFO silos</span>
           <ChevronRight className="h-4 w-4 text-zinc-500" aria-hidden="true" />
         </div>
-        <h2 className="max-w-3xl text-3xl font-medium leading-[1.1] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-[56px]">
+        <h2 className="max-w-3xl text-3xl font-medium leading-[1.1] text-white sm:text-4xl md:text-5xl lg:text-[56px]">
           Four engines. Four drivers. One coherent company.
         </h2>
         <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-800 md:grid-cols-4">
@@ -760,7 +771,7 @@ function SignupSection() {
     <section id="signup" className="relative z-20 bg-[#09090b] px-6 py-28">
       <div className="mx-auto grid max-w-5xl items-start gap-10 border-y border-zinc-800 py-16 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
-          <h2 className="text-3xl font-medium tracking-tight text-white md:text-4xl lg:text-[42px]">
+          <h2 className="text-3xl font-medium text-white md:text-4xl lg:text-[42px]">
             Join the first SimOne early access list.
           </h2>
           <p className="mt-5 max-w-md leading-7 text-zinc-400">
