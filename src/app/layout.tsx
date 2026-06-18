@@ -17,6 +17,11 @@ export const metadata: Metadata = {
   title: "SimOne | The conscious agent company",
   description:
     "A Systems Intelligence workspace for organizing AI agents by Product, Customer, Cash, and Skills engines.",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({

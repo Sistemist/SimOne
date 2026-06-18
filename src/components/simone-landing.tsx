@@ -62,7 +62,14 @@ const engines = [
 
 const drivers = ["Innovation", "Governance", "Interaction", "Culture"];
 const courseUrl = "https://www.sysdom.org/systems-intelligence-course";
+const bookDownloadUrl = "https://maven.com/hankay";
 const softEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const navLinks = [
+  { href: "#alpha", label: "Product" },
+  { href: "#paperclip", label: "Structure" },
+  { href: "#rag", label: "Memory" },
+  { href: "#engines", label: "Engines" },
+];
 
 const featureCards = [
   {
@@ -212,7 +219,6 @@ export function SimOneLanding() {
             </div>
           </div>
 
-          <LogoStrip />
           <FeatureCardsSection />
           <PaperclipSection />
           <RagSection />
@@ -240,24 +246,14 @@ function Navbar() {
               priority
             />
           </a>
-          <div className="hidden items-center gap-8 md:flex">
-            <a href="#alpha" className="text-sm text-zinc-400 transition hover:text-white">
-              Product
-            </a>
-            <a href="#engines" className="text-sm text-zinc-400 transition hover:text-white">
-              Engines
-            </a>
-            <a href="#signup" className="text-sm text-zinc-400 transition hover:text-white">
-              Alpha
-            </a>
-            <a href="#signup" className="text-sm text-zinc-400 transition hover:text-white">
-              Contact
-            </a>
+          <div className="hidden items-center gap-7 md:flex">
+            {navLinks.map((link) => (
+              <a key={link.href} href={link.href} className="text-sm text-zinc-400 transition hover:text-white">
+                {link.label}
+              </a>
+            ))}
           </div>
-          <div className="flex items-center gap-4">
-            <a href="#alpha" className="hidden text-sm text-zinc-400 transition hover:text-white sm:inline">
-              Learn
-            </a>
+          <div className="flex items-center">
             <a
               href="#signup"
               className="rounded-md border border-zinc-700 bg-zinc-800 px-3.5 py-1.5 text-sm text-white transition hover:bg-zinc-700"
@@ -520,20 +516,6 @@ function ActivityItem({
   );
 }
 
-function LogoStrip() {
-  return (
-    <section className="relative z-20 bg-[#09090b] px-6 pb-24">
-      <div className="mx-auto max-w-5xl border-y border-zinc-800 py-8">
-        <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-sm text-zinc-600">
-          {["Product Engine", "Customer Engine", "Cash Engine", "Skills Engine", "Driver Layer"].map((item) => (
-            <span key={item}>{item}</span>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function FeatureCardsSection() {
   return (
     <section id="alpha" className="relative z-20 bg-[#09090b] px-6 py-32">
@@ -556,7 +538,16 @@ function FeatureCardsSection() {
             className="max-w-md leading-7 text-zinc-400"
           >
             SimOne is the front door for testing whether SIM can become a practical agent-company
-            interface for students, founders, and readers.
+            interface for students, founders, and readers of the{" "}
+            <a
+              href={bookDownloadUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-white underline decoration-zinc-600 underline-offset-4 transition hover:decoration-white"
+            >
+              Conscious Systems book
+            </a>{" "}
+            (free download).
           </motion.p>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
@@ -639,7 +630,7 @@ function FeatureIllustration({ kind }: { kind: string }) {
 
 function PaperclipSection() {
   return (
-    <section className="relative z-20 bg-[#09090b] px-6 py-32">
+    <section id="paperclip" className="relative z-20 bg-[#09090b] px-6 py-32">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-emerald-400" />
@@ -673,7 +664,7 @@ function PaperclipSection() {
 
 function RagSection() {
   return (
-    <section className="relative z-20 overflow-hidden bg-[#09090b] px-6 py-32">
+    <section id="rag" className="relative z-20 overflow-hidden bg-[#09090b] px-6 py-32">
       <div className="relative mx-auto max-w-5xl">
         <div className="mb-8 flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-[#7170ff]" />
@@ -692,10 +683,10 @@ function RagSection() {
           <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#09090b] to-transparent" />
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#09090b] to-transparent" />
           <div
-            className="absolute left-1/2 top-20 h-[520px] w-[925px] opacity-30 grayscale lg:top-16 lg:h-[610px] lg:w-[1085px]"
+            className="absolute left-1/2 top-8 h-[560px] w-[995px] opacity-30 grayscale lg:top-0 lg:h-[660px] lg:w-[1175px]"
             style={{
               transform:
-                "translateX(-35%) perspective(1800px) rotateX(62deg) rotateZ(-26deg) scale(1.16)",
+                "translateX(-50%) perspective(1800px) rotateX(62deg) rotateZ(-26deg) scale(1.16)",
               transformOrigin: "50% 10%",
             }}
           >
@@ -797,9 +788,12 @@ function SignupSection() {
 function Footer() {
   return (
     <footer className="border-t border-zinc-800 bg-[#09090b] px-6 py-12">
-      <div className="mx-auto flex max-w-5xl flex-col gap-4 text-sm text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
-        <Image src="/simone-logo.png" alt="SimOne" width={132} height={36} className="h-6 w-auto opacity-80" />
-        <p>Systems Intelligence for agent-native builders.</p>
+      <div className="mx-auto flex max-w-5xl flex-col gap-5 text-sm text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
+        <Image src="/simone-logo.png" alt="SimOne" width={236} height={68} className="h-10 w-auto opacity-85" />
+        <div className="space-y-1 sm:text-right">
+          <p>Systems Intelligence for agent-native builders.</p>
+          <p>© 2026 Systems Intelligence LLC. All rights reserved.</p>
+        </div>
       </div>
     </footer>
   );
