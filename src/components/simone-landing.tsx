@@ -679,14 +679,14 @@ function RagSection() {
           Product, Customer, Cash, and Skills engines, coordinated by Innovation, Governance,
           Interaction, and Culture drivers.
         </p>
-        <div className="pointer-events-none relative z-0 mt-8 hidden h-[420px] overflow-hidden md:block lg:-mb-6 lg:h-[500px]" aria-hidden="true">
+        <div className="pointer-events-none relative left-1/2 z-0 mt-8 hidden h-[440px] w-screen -translate-x-1/2 overflow-hidden md:block lg:-mb-8 lg:h-[540px]" aria-hidden="true">
           <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#09090b] to-transparent" />
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#09090b] to-transparent" />
           <div
-            className="absolute left-1/2 top-8 h-[560px] w-[995px] opacity-30 grayscale lg:top-0 lg:h-[660px] lg:w-[1175px]"
+            className="absolute left-1/2 top-[-18px] h-[640px] w-[1138px] opacity-30 grayscale lg:top-[-28px] lg:h-[720px] lg:w-[1280px]"
             style={{
               transform:
-                "translateX(-50%) perspective(1800px) rotateX(62deg) rotateZ(-26deg) scale(1.16)",
+                "translateX(-58%) perspective(1800px) rotateX(62deg) rotateZ(-26deg) scale(1.16)",
               transformOrigin: "50% 10%",
             }}
           >
@@ -696,7 +696,7 @@ function RagSection() {
               width={1920}
               height={1080}
               className="h-full w-full object-contain"
-              sizes="1085px"
+              sizes="100vw"
             />
           </div>
         </div>
@@ -789,7 +789,13 @@ function Footer() {
   return (
     <footer className="border-t border-zinc-800 bg-[#09090b] px-6 py-12">
       <div className="mx-auto flex max-w-5xl flex-col gap-5 text-sm text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
-        <Image src="/simone-logo.png" alt="SimOne" width={236} height={68} className="h-10 w-auto opacity-85" />
+        <Image
+          src="/simone-logo.png"
+          alt="SimOne"
+          width={864}
+          height={322}
+          className="h-auto w-[150px] opacity-85 sm:w-[188px]"
+        />
         <div className="space-y-1 sm:text-right">
           <p>Systems Intelligence for agent-native builders.</p>
           <p>© 2026 Systems Intelligence LLC. All rights reserved.</p>
