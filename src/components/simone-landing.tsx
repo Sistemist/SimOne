@@ -240,6 +240,7 @@ function Navbar() {
               width={196}
               height={56}
               className="h-10 w-auto"
+              style={{ height: "auto" }}
               priority
             />
           </a>
@@ -290,7 +291,14 @@ function DashboardMockup() {
       >
         <div className="border-b border-zinc-800/50 p-3">
           <div className="flex items-center gap-2 px-2 py-1.5">
-            <Image src="/simone-logo.png" alt="SimOne" width={116} height={32} className="h-5 w-auto" />
+            <Image
+              src="/simone-logo.png"
+              alt="SimOne"
+              width={116}
+              height={32}
+              className="h-5 w-auto"
+              style={{ height: "auto" }}
+            />
             <ChevronDown className="ml-auto h-3.5 w-3.5 text-zinc-500" aria-hidden="true" />
           </div>
         </div>
@@ -787,6 +795,7 @@ function Footer() {
           width={864}
           height={322}
           className="h-auto w-[132px] opacity-85 sm:w-[164px]"
+          style={{ height: "auto" }}
         />
         <div className="space-y-1 sm:text-right">
           <p>Systems Intelligence for agent-native builders.</p>
