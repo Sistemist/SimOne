@@ -237,9 +237,9 @@ function Navbar() {
             <Image
               src="/simone-logo.png"
               alt="SimOne"
-              width={196}
-              height={56}
-              className="h-10 w-auto"
+              width={864}
+              height={322}
+              className="h-auto w-[148px] sm:w-[164px]"
               style={{ height: "auto" }}
               priority
             />
@@ -294,9 +294,9 @@ function DashboardMockup() {
             <Image
               src="/simone-logo.png"
               alt="SimOne"
-              width={116}
-              height={32}
-              className="h-5 w-auto"
+              width={864}
+              height={322}
+              className="h-auto w-[72px]"
               style={{ height: "auto" }}
             />
             <ChevronDown className="ml-auto h-3.5 w-3.5 text-zinc-500" aria-hidden="true" />
