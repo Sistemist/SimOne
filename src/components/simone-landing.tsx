@@ -68,7 +68,6 @@ const navLinks = [
   { href: "#alpha", label: "Product" },
   { href: "#paperclip", label: "Structure" },
   { href: "#rag", label: "Memory" },
-  { href: "#engines", label: "Engines" },
 ];
 
 const featureCards = [
@@ -222,7 +221,6 @@ export function SimOneLanding() {
           <FeatureCardsSection />
           <PaperclipSection />
           <RagSection />
-          <EngineSection />
           <SignupSection />
           <Footer />
         </div>
@@ -242,7 +240,7 @@ function Navbar() {
               alt="SimOne"
               width={196}
               height={56}
-              className="h-9 w-auto"
+              className="h-10 w-auto"
               priority
             />
           </a>
@@ -708,6 +706,30 @@ function RagSection() {
             </article>
           ))}
         </div>
+        <div className="mt-5 grid gap-px overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-800 md:grid-cols-4">
+          {engines.map((engine) => {
+            const Icon = engine.icon;
+            return (
+              <article key={engine.id} className="bg-zinc-950/95 p-5">
+                <div className="mb-8 flex items-center justify-between gap-3">
+                  <Icon className={`h-5 w-5 ${engine.color}`} aria-hidden="true" />
+                  <span className="rounded-full border border-zinc-800 px-2 py-1 text-[11px] text-zinc-500">
+                    {engine.state}
+                  </span>
+                </div>
+                <h3 className="text-base font-medium text-white">{engine.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-zinc-500">{engine.subtitle}</p>
+              </article>
+            );
+          })}
+        </div>
+        <div className="mt-5 flex flex-wrap gap-2 text-sm text-zinc-500">
+          {drivers.map((driver) => (
+            <span key={driver} className="rounded-full border border-zinc-800 bg-zinc-900/40 px-3 py-1.5">
+              {driver}
+            </span>
+          ))}
+        </div>
         <div className="mt-10 rounded-2xl border border-zinc-800 bg-zinc-950 p-6 font-mono text-sm text-zinc-500">
           <div>
             <span className="text-zinc-600">simone.context</span>
@@ -722,35 +744,6 @@ function RagSection() {
           <div className="mt-3 text-zinc-600">
             <span>{"//"}</span> Smaller prompts. Better shared memory. Clearer human approval at engine boundaries.
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function EngineSection() {
-  return (
-    <section id="engines" className="relative z-20 bg-[#09090b] px-6 py-28">
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-8 flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-[#7170ff]" />
-          <span className="text-sm text-zinc-400">The operating replacement for CEO/CMO/CFO silos</span>
-          <ChevronRight className="h-4 w-4 text-zinc-500" aria-hidden="true" />
-        </div>
-        <h2 className="max-w-3xl text-3xl font-medium leading-[1.1] text-white sm:text-4xl md:text-5xl lg:text-[56px]">
-          Four engines. Four drivers. One coherent company.
-        </h2>
-        <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-800 md:grid-cols-4">
-          {engines.map((engine) => {
-            const Icon = engine.icon;
-            return (
-              <article key={engine.id} className="bg-zinc-950 p-6">
-                <Icon className={`mb-12 h-6 w-6 ${engine.color}`} aria-hidden="true" />
-                <h3 className="text-lg font-medium text-white">{engine.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-zinc-500">{engine.subtitle}</p>
-              </article>
-            );
-          })}
         </div>
       </div>
     </section>
@@ -794,7 +787,7 @@ function Footer() {
           alt="SimOne"
           width={864}
           height={322}
-          className="h-auto w-[150px] opacity-85 sm:w-[188px]"
+          className="h-auto w-[132px] opacity-85 sm:w-[164px]"
         />
         <div className="space-y-1 sm:text-right">
           <p>Systems Intelligence for agent-native builders.</p>
