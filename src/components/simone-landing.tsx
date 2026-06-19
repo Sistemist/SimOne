@@ -161,7 +161,7 @@ export function SimOneLanding() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center"
+                className="mt-8 flex flex-col gap-y-3 sm:flex-row sm:items-center sm:gap-x-8"
               >
                 <a
                   href="#signup"
