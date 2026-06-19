@@ -239,7 +239,7 @@ function Navbar() {
               alt="SimOne"
               width={864}
               height={322}
-              className="h-auto w-[148px] sm:w-[164px]"
+              className="h-auto w-[124px] sm:w-[136px]"
               style={{ height: "auto" }}
               priority
             />
@@ -759,8 +759,8 @@ function RagSection() {
 
 function SignupSection() {
   return (
-    <section id="signup" className="relative z-20 bg-[#09090b] px-6 py-28">
-      <div className="mx-auto grid max-w-5xl items-start gap-10 border-y border-zinc-800 py-16 lg:grid-cols-[0.9fr_1.1fr]">
+    <section id="signup" className="relative z-20 bg-[#09090b] px-6 pb-16 pt-24">
+      <div className="mx-auto grid max-w-5xl items-start gap-10 border-t border-zinc-800 pt-14 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
           <h2 className="text-3xl font-medium text-white md:text-4xl lg:text-[42px]">
             Join the SimOne early access list.
@@ -787,15 +787,14 @@ function SignupSection() {
 
 function Footer() {
   return (
-    <footer className="border-t border-zinc-800 bg-[#09090b] px-6 py-12">
+    <footer className="bg-[#09090b] px-6 pb-12 pt-4">
       <div className="mx-auto flex max-w-5xl flex-col gap-5 text-sm text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
         <Image
-          src="/simone-logo.png"
+          src="/favicon.png"
           alt="SimOne"
-          width={864}
-          height={322}
-          className="h-auto w-[132px] opacity-85 sm:w-[164px]"
-          style={{ height: "auto" }}
+          width={1000}
+          height={1000}
+          className="h-8 w-8 opacity-85"
         />
         <div className="space-y-1 sm:text-right">
           <p>Systems Intelligence for agent-native builders.</p>
