@@ -176,7 +176,6 @@ export function SimOneLanding() {
                   rel="noreferrer"
                   className="inline-flex h-11 w-fit items-center gap-2 text-sm font-medium text-zinc-300 transition hover:text-white"
                 >
-                  <span className="text-zinc-500">New:</span>
                   Learn more about the SIM
                   <ChevronRight className="h-4 w-4" aria-hidden="true" />
                 </a>
@@ -756,7 +755,7 @@ function SignupSection() {
       <div className="mx-auto grid max-w-5xl items-start gap-10 border-y border-zinc-800 py-16 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
           <h2 className="text-3xl font-medium text-white md:text-4xl lg:text-[42px]">
-            Join the first SimOne early access list.
+            Join the SimOne early access list.
           </h2>
           <p className="mt-5 max-w-md leading-7 text-zinc-400">
             We’ll use this list for alpha access, demo updates, and the first cohort learning loop.

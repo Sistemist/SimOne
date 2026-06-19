@@ -79,7 +79,7 @@ export function SignupForm({ variant = "light" }: { variant?: "light" | "dark" }
             name="name"
             type="text"
             autoComplete="name"
-            placeholder="Han Kay"
+            placeholder="Your name"
           />
         </label>
         <label className="block">
