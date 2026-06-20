@@ -1,5 +1,15 @@
 import { pgTable, text, timestamp, uuid, jsonb } from "drizzle-orm/pg-core";
 
+export const earlyAccessLeads = pgTable("early_access_leads", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: text("email").notNull(),
+  name: text("name").notNull().default(""),
+  useCase: text("use_case").notNull().default(""),
+  source: text("source").notNull().default("simone-landing"),
+  notificationStatus: text("notification_status").notNull().default("pending"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 export const ventures = pgTable("ventures", {
   id: uuid("id").defaultRandom().primaryKey(),
   ownerEmail: text("owner_email").notNull(),
@@ -30,4 +40,5 @@ export const agentRuns = pgTable("agent_runs", {
   humanApproval: text("human_approval").notNull().default("required"),
   trace: jsonb("trace").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

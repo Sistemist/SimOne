@@ -8,8 +8,6 @@ type Status =
   | { kind: "success"; message: string }
   | { kind: "error"; message: string };
 
-const publicWeb3FormsKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
-
 export function SignupForm({ variant = "light" }: { variant?: "light" | "dark" }) {
   const [status, setStatus] = useState<Status>({ kind: "idle", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,8 +18,6 @@ export function SignupForm({ variant = "light" }: { variant?: "light" | "dark" }
   const labelClass = isDark ? "text-sm font-medium text-zinc-300" : "text-sm font-medium text-[#393630]";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    if (publicWeb3FormsKey) return;
-
     event.preventDefault();
     setStatus({ kind: "idle", message: "" });
     setIsSubmitting(true);
@@ -69,8 +65,6 @@ export function SignupForm({ variant = "light" }: { variant?: "light" | "dark" }
 
   return (
     <form
-      action={publicWeb3FormsKey ? "https://api.web3forms.com/submit" : undefined}
-      method={publicWeb3FormsKey ? "POST" : undefined}
       onSubmit={handleSubmit}
       className={
         isDark
@@ -78,15 +72,6 @@ export function SignupForm({ variant = "light" }: { variant?: "light" | "dark" }
           : "rounded-lg border border-[#d8d3c7] bg-white p-5 shadow-sm"
       }
     >
-      {publicWeb3FormsKey ? (
-        <>
-          <input type="hidden" name="access_key" value={publicWeb3FormsKey} />
-          <input type="hidden" name="subject" value="SimOne Early Access Signup" />
-          <input type="hidden" name="from_name" value="SimOne Site" />
-          <input type="hidden" name="source" value="simone-landing" />
-          <input type="hidden" name="redirect" value="https://sim.sysdom.org/#signup" />
-        </>
-      ) : null}
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
           <span className={labelClass}>Name</span>
@@ -121,9 +106,6 @@ export function SignupForm({ variant = "light" }: { variant?: "light" | "dark" }
           name="useCase"
           placeholder="Course project, founder operating system, agent-company experiment..."
         />
-        {publicWeb3FormsKey ? (
-          <input type="hidden" name="message" value="SimOne early access signup" />
-        ) : null}
       </label>
       <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <p className={`text-sm leading-6 ${isDark ? "text-zinc-500" : "text-[#6f6a60]"}`}>

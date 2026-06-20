@@ -11,6 +11,7 @@ import {
   Check,
   ChevronRight,
   CircleAlert,
+  Download,
   GitBranch,
   Layers3,
   Orbit,
@@ -20,17 +21,30 @@ import {
   Users,
 } from "lucide-react";
 
+import type { AlphaUser } from "@/components/simone-account-bar";
+import type { AiConfigStatus } from "@/lib/ai-config";
+import {
+  AgentRunDraft,
+  createAgentRunDraft,
+  loadAgentRuns,
+  saveAgentRuns,
+} from "@/lib/agent-runs";
 import {
   DriverKey,
   EngineKey,
   SimOneVenture,
+  SprintZeroItem,
+  SprintZeroScope,
   drivers,
   engines,
   loadVenture,
   saveVenture,
 } from "@/lib/simone-model";
+import { summarizeSprintZeroReadiness } from "@/lib/sprint-zero-readiness";
+import { createVentureExport, ventureExportFilename } from "@/lib/venture-transfer";
 
 type SectionKey = EngineKey | DriverKey | "assumptions" | "gates" | "coherence";
+type SyncState = "local" | "syncing" | "synced" | "unavailable" | "error";
 
 const iconMap = {
   Box,
@@ -43,17 +57,38 @@ const iconMap = {
   Orbit,
 };
 
-export function SimOneWorkspace({ ventureId }: { ventureId: string }) {
+export function SimOneWorkspace({
+  ventureId,
+  alphaUser,
+  persistenceReady,
+  aiConfigStatus,
+}: {
+  ventureId: string;
+  alphaUser?: AlphaUser | null;
+  persistenceReady?: boolean;
+  aiConfigStatus?: AiConfigStatus;
+}) {
   const router = useRouter();
-  const [venture, setVenture] = useState<SimOneVenture | null>(() => loadVenture(ventureId));
+  const [venture, setVenture] = useState<SimOneVenture | null>(null);
   const [active, setActive] = useState<SectionKey>("product");
   const [saved, setSaved] = useState(false);
+  const [syncState, setSyncState] = useState<SyncState>(
+    alphaUser ? (persistenceReady ? "syncing" : "unavailable") : "local",
+  );
+  const [agentRuns, setAgentRuns] = useState<AgentRunDraft[]>(() => loadAgentRuns(ventureId));
 
   useEffect(() => {
-    if (!venture) {
-      router.replace("/app/onboarding");
-    }
-  }, [router, venture]);
+    const timeout = window.setTimeout(() => {
+      const loadedVenture = loadVenture(ventureId);
+      setVenture(loadedVenture);
+
+      if (!loadedVenture) {
+        router.replace("/app/onboarding");
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, [router, ventureId]);
 
   useEffect(() => {
     if (!venture) return;
@@ -61,18 +96,82 @@ export function SimOneWorkspace({ ventureId }: { ventureId: string }) {
       saveVenture(venture);
       setSaved(true);
       window.setTimeout(() => setSaved(false), 1200);
+
+      if (!alphaUser) {
+        setSyncState("local");
+        return;
+      }
+
+      if (!persistenceReady) {
+        setSyncState("unavailable");
+        return;
+      }
+
+      setSyncState("syncing");
+      fetch("/api/ventures", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ venture }),
+      })
+        .then((response) => {
+          if (response.ok) {
+            setSyncState("synced");
+            return;
+          }
+
+          setSyncState(response.status === 503 ? "unavailable" : "error");
+        })
+        .catch(() => setSyncState("error"));
     }, 350);
     return () => window.clearTimeout(timeout);
-  }, [venture]);
+  }, [alphaUser, persistenceReady, venture]);
+
+  useEffect(() => {
+    saveAgentRuns(ventureId, agentRuns);
+  }, [agentRuns, ventureId]);
+
+  function syncAgentRun(agentRun: AgentRunDraft) {
+    if (!alphaUser || !persistenceReady || !venture) return;
+
+    fetch("/api/ventures", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ venture }),
+    })
+      .then((response) => {
+        if (!response.ok) return;
+
+        return fetch("/api/agent-runs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ agentRun }),
+        });
+      })
+      .catch(() => {
+        // The local approval ledger remains the source of continuity if cloud sync is interrupted.
+      });
+  }
 
   const completion = useMemo(() => {
     if (!venture) return 0;
-    const specs = [...Object.values(venture.engines), ...Object.values(venture.drivers)];
-    const filled = specs.filter(
-      (spec) => spec.inputs && spec.process && spec.outputs && spec.feedback && spec.metrics,
-    ).length;
-    return Math.round((filled / specs.length) * 100);
+    return summarizeSprintZeroReadiness(venture).percent;
   }, [venture]);
+  const readiness = useMemo(() => {
+    if (!venture) return null;
+    return summarizeSprintZeroReadiness(venture);
+  }, [venture]);
+
+  function exportVenture() {
+    if (!venture) return;
+
+    const payload = JSON.stringify(createVentureExport(venture), null, 2);
+    const url = window.URL.createObjectURL(new Blob([payload], { type: "application/json" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = ventureExportFilename(venture);
+    link.click();
+    window.URL.revokeObjectURL(url);
+  }
 
   if (!venture) {
     return (
@@ -91,10 +190,11 @@ export function SimOneWorkspace({ ventureId }: { ventureId: string }) {
               <Image
                 src="/simone-logo.png"
                 alt="SimOne"
-                width={108}
-                height={43}
+                width={864}
+                height={322}
                 priority
-                style={{ width: "108px", height: "auto" }}
+                className="h-auto w-[108px]"
+                style={{ height: "auto" }}
               />
             </Link>
             <span className="rounded-md border border-zinc-800 px-2 py-1 text-xs text-zinc-500">
@@ -144,6 +244,17 @@ export function SimOneWorkspace({ ventureId }: { ventureId: string }) {
                 {saved ? <Check size={15} className="text-emerald-400" /> : <Save size={15} />}
                 {saved ? "Saved" : "Autosave"}
               </div>
+              <div className="rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-400">
+                {syncLabel(syncState)}
+              </div>
+              <button
+                type="button"
+                onClick={exportVenture}
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-800 px-3 text-sm text-zinc-300 transition hover:border-zinc-600 hover:text-white"
+              >
+                <Download size={15} aria-hidden="true" />
+                Export
+              </button>
             </div>
           </header>
 
@@ -154,8 +265,16 @@ export function SimOneWorkspace({ ventureId }: { ventureId: string }) {
             </section>
             <aside className="space-y-6">
               <SimCanvas active={active} setActive={setActive} />
+              {readiness ? <SprintZeroReviewCard readiness={readiness} /> : null}
               <AgentBoundaryCard />
-              <DifyCard />
+              <AgentQueueCard
+                active={active}
+                ventureId={venture.id}
+                agentRuns={agentRuns}
+                setAgentRuns={setAgentRuns}
+                syncAgentRun={syncAgentRun}
+              />
+              <ReadinessCard aiConfigStatus={aiConfigStatus} />
             </aside>
           </div>
         </section>
@@ -202,6 +321,7 @@ function renderActiveSection(
         title="Assumptions"
         note="Make the leap-of-faith assumptions explicit before building."
         items={venture.assumptions}
+        addLabel="Add assumption"
         onChange={(items) => setVenture({ ...venture, assumptions: items })}
       />
     );
@@ -213,6 +333,7 @@ function renderActiveSection(
         title="Decision Gates"
         note="Define stop, iterate, proceed, and scale rules before emotion enters the room."
         items={venture.decisionGates}
+        addLabel="Add gate"
         onChange={(items) => setVenture({ ...venture, decisionGates: items })}
       />
     );
@@ -308,36 +429,91 @@ function ListEditor({
   title,
   note,
   items,
+  addLabel,
   onChange,
 }: {
   title: string;
   note: string;
-  items: string[];
-  onChange: (items: string[]) => void;
+  items: SprintZeroItem[];
+  addLabel: string;
+  onChange: (items: SprintZeroItem[]) => void;
 }) {
   return (
     <section className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-5">
       <SectionTitle title={title} note={note} />
       <div className="mt-5 space-y-3">
         {items.map((item, index) => (
-          <input
-            key={index}
-            value={item}
-            onChange={(event) => {
-              const next = [...items];
-              next[index] = event.target.value;
-              onChange(next);
-            }}
-            className="h-12 w-full rounded-xl border border-zinc-800 bg-[#09090b] px-3 text-base text-zinc-200 outline-none focus:border-zinc-600"
-          />
+          <div key={item.id} className="rounded-xl border border-zinc-800 bg-[#09090b] p-3">
+            <div className="grid gap-3 md:grid-cols-[180px_1fr_140px]">
+              <label>
+                <span className="text-xs uppercase tracking-[0.16em] text-zinc-600">Scope</span>
+                <select
+                  value={item.scope}
+                  onChange={(event) => {
+                    const next = [...items];
+                    next[index] = { ...item, scope: event.target.value as SprintZeroScope };
+                    onChange(next);
+                  }}
+                  className="mt-2 h-11 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-200 outline-none transition focus:border-zinc-600"
+                >
+                  {[...engines, ...drivers].map((scope) => (
+                    <option key={scope.key} value={scope.key}>
+                      {scope.shortLabel}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span className="text-xs uppercase tracking-[0.16em] text-zinc-600">Statement</span>
+                <input
+                  value={item.text}
+                  onChange={(event) => {
+                    const next = [...items];
+                    next[index] = { ...item, text: event.target.value };
+                    onChange(next);
+                  }}
+                  className="mt-2 h-11 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-base text-zinc-200 outline-none transition placeholder:text-zinc-600 focus:border-zinc-600"
+                />
+              </label>
+              <label>
+                <span className="text-xs uppercase tracking-[0.16em] text-zinc-600">Status</span>
+                <select
+                  value={item.status}
+                  onChange={(event) => {
+                    const next = [...items];
+                    next[index] = {
+                      ...item,
+                      status: event.target.value as SprintZeroItem["status"],
+                    };
+                    onChange(next);
+                  }}
+                  className="mt-2 h-11 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-200 outline-none transition focus:border-zinc-600"
+                >
+                  <option value="draft">Draft</option>
+                  <option value="testing">Testing</option>
+                  <option value="resolved">Resolved</option>
+                </select>
+              </label>
+            </div>
+          </div>
         ))}
       </div>
       <button
         type="button"
-        onClick={() => onChange([...items, ""])}
+        onClick={() =>
+          onChange([
+            ...items,
+            {
+              id: crypto.randomUUID(),
+              scope: "product",
+              text: "",
+              status: "draft",
+            },
+          ])
+        }
         className="mt-4 rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-300 transition hover:border-zinc-600 hover:text-white"
       >
-        Add line
+        {addLabel}
       </button>
     </section>
   );
@@ -413,19 +589,188 @@ function AgentBoundaryCard() {
   );
 }
 
-function DifyCard() {
+function SprintZeroReviewCard({
+  readiness,
+}: {
+  readiness: ReturnType<typeof summarizeSprintZeroReadiness>;
+}) {
+  return (
+    <section className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-5">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-sm text-zinc-300">
+          <Check size={16} />
+          Sprint Zero review
+        </div>
+        <span className="rounded-md border border-zinc-800 px-2 py-1 text-xs text-zinc-500">
+          {readiness.completedComponents}/{readiness.totalComponents}
+        </span>
+      </div>
+      <div className="mt-4 h-2 rounded-full bg-zinc-900">
+        <div
+          className="h-2 rounded-full bg-[#7170ff]"
+          style={{ width: `${readiness.percent}%` }}
+        />
+      </div>
+      <div className="mt-3 text-sm text-zinc-400">{readiness.percent}% mapped</div>
+      {readiness.nextGaps.length ? (
+        <ul className="mt-4 space-y-2">
+          {readiness.nextGaps.map((gap) => (
+            <li key={gap} className="text-sm leading-5 text-zinc-500">
+              {gap}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </section>
+  );
+}
+
+function AgentQueueCard({
+  active,
+  ventureId,
+  agentRuns,
+  setAgentRuns,
+  syncAgentRun,
+}: {
+  active: SectionKey;
+  ventureId: string;
+  agentRuns: AgentRunDraft[];
+  setAgentRuns: (runs: AgentRunDraft[]) => void;
+  syncAgentRun: (run: AgentRunDraft) => void;
+}) {
+  const defaultScope = isSprintZeroScope(active) ? active : "product";
+
+  function queueTask(formData: FormData) {
+    const task = String(formData.get("task") || "");
+    const scope = String(formData.get("scope") || defaultScope) as SprintZeroScope;
+    if (!task.trim()) return;
+
+    const run = createAgentRunDraft({ ventureId, scope, task });
+    setAgentRuns([run, ...agentRuns]);
+    syncAgentRun(run);
+  }
+
+  function approveTask(run: AgentRunDraft) {
+    const approvedRun = {
+      ...run,
+      status: "approved" as const,
+      humanApproval: "approved" as const,
+      updatedAt: new Date().toISOString(),
+    };
+
+    setAgentRuns(agentRuns.map((item) => (item.id === run.id ? approvedRun : item)));
+    syncAgentRun(approvedRun);
+  }
+
   return (
     <section className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-5">
       <div className="flex items-center gap-2 text-sm text-[#7170ff]">
         <Sparkles size={16} />
-        Dify retrieval path
+        Agent approval queue
       </div>
-      <p className="mt-3 text-sm leading-6 text-zinc-400">
-        SimOne will retrieve from the cloned SIM knowledge base and a separate operational knowledge
-        set. Until keys are connected, this workspace keeps the workflow explicit without fake AI
-        output.
-      </p>
+      <form
+        action={queueTask}
+        className="mt-4 space-y-3"
+      >
+        <select
+          name="scope"
+          defaultValue={defaultScope}
+          className="h-10 w-full rounded-lg border border-zinc-800 bg-[#09090b] px-3 text-sm text-zinc-200 outline-none transition focus:border-zinc-600"
+        >
+          {[...engines, ...drivers].map((scope) => (
+            <option key={scope.key} value={scope.key}>
+              {scope.shortLabel}
+            </option>
+          ))}
+        </select>
+        <textarea
+          name="task"
+          className="min-h-24 w-full rounded-lg border border-zinc-800 bg-[#09090b] p-3 text-sm leading-6 text-zinc-200 outline-none transition placeholder:text-zinc-600 focus:border-zinc-600"
+          placeholder="Queue a bounded agent task..."
+        />
+        <button
+          type="submit"
+          className="inline-flex h-10 w-full items-center justify-center rounded-lg border border-zinc-800 px-4 text-sm font-medium text-zinc-300 transition hover:border-zinc-600 hover:text-white"
+        >
+          Queue for approval
+        </button>
+      </form>
+
+      <div className="mt-4 space-y-3">
+        {agentRuns.slice(0, 3).map((run) => (
+          <div key={run.id} className="rounded-xl border border-zinc-800 bg-[#09090b] p-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-xs uppercase tracking-[0.16em] text-zinc-600">
+                {scopeLabel(run.scope)}
+              </span>
+              <span className="rounded-md border border-zinc-800 px-2 py-1 text-xs text-zinc-500">
+                {run.humanApproval === "approved" ? "Approved" : "Approval required"}
+              </span>
+            </div>
+            <p className="mt-2 text-sm leading-6 text-zinc-300">{run.task}</p>
+            {run.humanApproval !== "approved" ? (
+              <button
+                type="button"
+                onClick={() => approveTask(run)}
+                className="mt-3 text-sm font-medium text-zinc-200 transition hover:text-white"
+              >
+                Approve
+              </button>
+            ) : null}
+          </div>
+        ))}
+      </div>
     </section>
+  );
+}
+
+function ReadinessCard({ aiConfigStatus }: { aiConfigStatus?: AiConfigStatus }) {
+  const status = aiConfigStatus || {
+    neon: { ready: false, missing: ["DATABASE_URL"] },
+    dify: { ready: false, missing: ["DIFY_API_KEY", "DIFY_BASE_URL", "DIFY_SIM_KNOWLEDGE_ID"] },
+    openRouter: { ready: false, missing: ["OPENROUTER_API_KEY"] },
+  };
+
+  return (
+    <section className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-5">
+      <div className="flex items-center gap-2 text-sm text-zinc-300">
+        <Radio size={16} />
+        Connection readiness
+      </div>
+      <div className="mt-4 space-y-3">
+        <ReadinessRow label="Neon" check={status.neon} />
+        <ReadinessRow label="Dify" check={status.dify} />
+        <ReadinessRow label="OpenRouter" check={status.openRouter} />
+      </div>
+    </section>
+  );
+}
+
+function ReadinessRow({
+  label,
+  check,
+}: {
+  label: string;
+  check: { ready: boolean; missing: string[] };
+}) {
+  return (
+    <div className="rounded-xl border border-zinc-800 bg-[#09090b] p-3">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-sm font-medium text-zinc-200">{label}</span>
+        <span
+          className={`rounded-md border px-2 py-1 text-xs ${
+            check.ready
+              ? "border-emerald-500/30 text-emerald-300"
+              : "border-amber-500/30 text-amber-300"
+          }`}
+        >
+          {check.ready ? "Ready" : "Needs config"}
+        </span>
+      </div>
+      {!check.ready ? (
+        <p className="mt-2 text-xs leading-5 text-zinc-500">{check.missing.join(", ")}</p>
+      ) : null}
+    </div>
   );
 }
 
@@ -492,4 +837,20 @@ function activeLabel(active: SectionKey) {
   if (active === "gates") return "Decision Gates";
   if (active === "coherence") return "Coherence Review";
   return [...engines, ...drivers].find((item) => item.key === active)?.shortLabel || "Workspace";
+}
+
+function isSprintZeroScope(active: SectionKey): active is SprintZeroScope {
+  return [...engines, ...drivers].some((item) => item.key === active);
+}
+
+function scopeLabel(scope: SprintZeroScope) {
+  return [...engines, ...drivers].find((item) => item.key === scope)?.shortLabel || scope;
+}
+
+function syncLabel(state: SyncState) {
+  if (state === "syncing") return "Syncing";
+  if (state === "synced") return "Cloud synced";
+  if (state === "unavailable") return "Neon needed";
+  if (state === "error") return "Sync paused";
+  return "Local only";
 }

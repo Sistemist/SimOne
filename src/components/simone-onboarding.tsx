@@ -7,9 +7,10 @@ import { FormEvent, useState } from "react";
 import { ArrowRight, Layers3, ShieldCheck, Sparkles } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { SimOneAccountBar, type AlphaUser } from "@/components/simone-account-bar";
 import { createVenture, loadVentures, saveVenture } from "@/lib/simone-model";
 
-export function SimOneOnboarding() {
+export function SimOneOnboarding({ alphaUser }: { alphaUser?: AlphaUser | null }) {
   const router = useRouter();
   const [existingId] = useState<string | null>(() => loadVentures()[0]?.id || null);
 
@@ -28,25 +29,29 @@ export function SimOneOnboarding() {
 
   return (
     <main className="min-h-screen bg-[#09090b] text-white">
-      <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-6">
+      <header className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
         <Link href="/" className="flex items-center gap-3">
           <Image
             src="/simone-logo.png"
             alt="SimOne"
-            width={132}
-            height={53}
+            width={864}
+            height={322}
             priority
-            style={{ width: "132px", height: "auto" }}
+            className="h-auto w-[132px]"
+            style={{ height: "auto" }}
           />
         </Link>
-        {existingId ? (
-          <Link
-            href={`/app/ventures/${existingId}`}
-            className="rounded-lg border border-zinc-800 px-4 py-2 text-sm text-zinc-300 transition hover:border-zinc-600 hover:text-white"
-          >
-            Return to workspace
-          </Link>
-        ) : null}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <SimOneAccountBar alphaUser={alphaUser} syncNote={alphaUser ? "Ready to sync maps" : undefined} />
+          {existingId ? (
+            <Link
+              href={`/app/ventures/${existingId}`}
+              className="inline-flex h-10 items-center justify-center rounded-lg border border-zinc-800 px-4 text-sm text-zinc-300 transition hover:border-zinc-600 hover:text-white"
+            >
+              Return to workspace
+            </Link>
+          ) : null}
+        </div>
       </header>
 
       <section className="mx-auto grid w-full max-w-7xl gap-10 px-6 pb-16 pt-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">

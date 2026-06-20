@@ -1,5 +1,8 @@
-import { redirect } from "next/navigation";
+import { SimOneAppHome } from "@/components/simone-app-home";
+import { getCurrentAlphaUser } from "@/lib/auth";
 
-export default function AppIndexPage() {
-  redirect("/app/onboarding");
+export default async function AppIndexPage() {
+  const alphaUser = await getCurrentAlphaUser();
+
+  return <SimOneAppHome alphaUser={alphaUser} persistenceReady={Boolean(process.env.DATABASE_URL)} />;
 }

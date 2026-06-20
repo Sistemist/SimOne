@@ -20,6 +20,15 @@ export type SimSpec = SimComponent & {
   status: "draft" | "learning" | "ready";
 };
 
+export type SprintZeroScope = EngineKey | DriverKey;
+
+export type SprintZeroItem = {
+  id: string;
+  scope: SprintZeroScope;
+  text: string;
+  status: "draft" | "testing" | "resolved";
+};
+
 export type SimOneVenture = {
   id: string;
   name: string;
@@ -30,8 +39,8 @@ export type SimOneVenture = {
   updatedAt: string;
   engines: Record<EngineKey, SimSpec>;
   drivers: Record<DriverKey, SimSpec>;
-  assumptions: string[];
-  decisionGates: string[];
+  assumptions: SprintZeroItem[];
+  decisionGates: SprintZeroItem[];
   experiments: string[];
   coherenceReview: string;
 };
@@ -132,14 +141,17 @@ export function createVenture(input: {
     engines: createSpecs(engines) as Record<EngineKey, SimSpec>,
     drivers: createSpecs(drivers) as Record<DriverKey, SimSpec>,
     assumptions: [
-      "The problem is urgent enough that the right people will change behavior.",
-      "The first offer can prove value before the full system is built.",
-      "The founder can hold judgment while agents execute bounded tasks.",
+      createSprintZeroItem(
+        "customer",
+        "The problem is urgent enough that the right people will change behavior.",
+      ),
+      createSprintZeroItem("product", "The first offer can prove value before the full system is built."),
+      createSprintZeroItem("governance", "The founder can hold judgment while agents execute bounded tasks."),
     ],
     decisionGates: [
-      "Proceed when one target user confirms the problem in their own words.",
-      "Iterate when evidence is mixed but the engine map remains coherent.",
-      "Stop or reframe when the weakest engine blocks all other progress.",
+      createSprintZeroItem("customer", "Proceed when one target user confirms the problem in their own words."),
+      createSprintZeroItem("innovation", "Iterate when evidence is mixed but the engine map remains coherent."),
+      createSprintZeroItem("governance", "Stop or reframe when the weakest engine blocks all other progress."),
     ],
     experiments: [
       "Interview 5 coherent builders and map their language to SIM engines.",
@@ -148,6 +160,62 @@ export function createVenture(input: {
     ],
     coherenceReview:
       "Human remains Meta-Controller. SimOne routes attention as Supervisory Controller. Agents only execute bounded Embodied Controller tasks inside explicit engine and driver boundaries.",
+  };
+}
+
+export function createSampleVenture(): SimOneVenture {
+  const venture = createVenture({
+    name: "Course Studio",
+    idea: "A cohort product that helps conscious builders map an idea into a working system.",
+    audience: "Founders learning the Systems Intelligence Model during the course alpha.",
+    intent: "Keep human judgment as the Meta-Controller while agents support bounded learning loops.",
+  });
+
+  return {
+    ...venture,
+    engines: {
+      ...venture.engines,
+      product: {
+        ...venture.engines.product,
+        inputs: "Course framework, founder questions, SIM engine prompts, weekly exercises.",
+        process: "Turn live venture uncertainty into Sprint Zero maps, experiments, and reviews.",
+        outputs: "A completed first system map and a testable next offer.",
+        feedback: "Student demos, friction notes, and weekly coherence reviews.",
+        metrics: "Activation rate, completed system maps, demo readiness, learning-loop completion.",
+        status: "learning",
+      },
+      customer: {
+        ...venture.engines.customer,
+        inputs: "Course students, book audience, Maven traffic, prior founder conversations.",
+        process: "Recruit coherent builders and translate their language into engine-specific needs.",
+        outputs: "Qualified alpha users and repeated problem language.",
+        feedback: "Interview quotes, signup source, return visits, and workshop objections.",
+        metrics: "Signup conversion, first-session completion, interview confirmation rate.",
+        status: "learning",
+      },
+    },
+    drivers: {
+      ...venture.drivers,
+      governance: {
+        ...venture.drivers.governance,
+        inputs: "Meta-intent, approval boundaries, agent task policy, launch risks.",
+        process: "Keep cross-engine commitments under human review before public claims or cash decisions.",
+        outputs: "Clear stop/iterate/proceed rules for each Sprint Zero loop.",
+        feedback: "Decision log, unresolved risks, and human approval checkpoints.",
+        metrics: "Reviewed gates, unresolved risk count, approvals before external commitments.",
+        status: "learning",
+      },
+    },
+    assumptions: [
+      createSprintZeroItem("customer", "Course students will benefit from mapping their own venture in-session."),
+      createSprintZeroItem("product", "A usable Sprint Zero map can create value before AI generation is connected."),
+      createSprintZeroItem("governance", "Human approval boundaries make the alpha more trustworthy, not slower."),
+    ],
+    decisionGates: [
+      createSprintZeroItem("customer", "Proceed when three students can explain their engine bottleneck in their own words."),
+      createSprintZeroItem("product", "Iterate when the map is useful but a section feels abstract or hard to complete."),
+      createSprintZeroItem("governance", "Stop or reframe before any agent output becomes a customer promise."),
+    ],
   };
 }
 
@@ -174,10 +242,17 @@ export function loadVentures(): SimOneVenture[] {
   if (!raw) return [];
 
   try {
-    return JSON.parse(raw) as SimOneVenture[];
+    const ventures = JSON.parse(raw) as SimOneVenture[];
+    return ventures.map(normalizeVenture);
   } catch {
     return [];
   }
+}
+
+export function saveVentures(ventures: SimOneVenture[]) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem("simone.ventures", JSON.stringify(ventures));
+  window.dispatchEvent(new Event("simone:ventures"));
 }
 
 export function saveVenture(venture: SimOneVenture) {
@@ -186,9 +261,56 @@ export function saveVenture(venture: SimOneVenture) {
     { ...venture, updatedAt: new Date().toISOString() },
     ...ventures.filter((item) => item.id !== venture.id),
   ];
-  window.localStorage.setItem("simone.ventures", JSON.stringify(next));
+  saveVentures(next);
+}
+
+export function removeVentureById(ventures: SimOneVenture[], ventureId: string) {
+  return ventures.filter((venture) => venture.id !== ventureId);
+}
+
+export function deleteVenture(ventureId: string) {
+  saveVentures(removeVentureById(loadVentures(), ventureId));
 }
 
 export function loadVenture(id: string): SimOneVenture | null {
   return loadVentures().find((venture) => venture.id === id) || null;
+}
+
+export function getWorkspaceEntryPath(ventures: Pick<SimOneVenture, "id">[]) {
+  const firstVenture = ventures[0];
+  return firstVenture ? `/app/ventures/${firstVenture.id}` : "/app/onboarding";
+}
+
+function createSprintZeroItem(scope: SprintZeroScope, text: string): SprintZeroItem {
+  return {
+    id: crypto.randomUUID(),
+    scope,
+    text,
+    status: "draft",
+  };
+}
+
+export function normalizeVenture(venture: SimOneVenture): SimOneVenture {
+  return {
+    ...venture,
+    assumptions: normalizeSprintZeroItems(venture.assumptions, "customer"),
+    decisionGates: normalizeSprintZeroItems(venture.decisionGates, "governance"),
+  };
+}
+
+function normalizeSprintZeroItems(
+  items: Array<SprintZeroItem | string>,
+  fallbackScope: SprintZeroScope,
+): SprintZeroItem[] {
+  return items.map((item) => {
+    if (typeof item === "string") {
+      return createSprintZeroItem(fallbackScope, item);
+    }
+
+    return {
+      ...item,
+      scope: item.scope || fallbackScope,
+      status: item.status || "draft",
+    };
+  });
 }
