@@ -208,7 +208,7 @@ export function SimOneLanding() {
                   transformOrigin: "0 0",
                   backfaceVisibility: "hidden",
                   transform:
-                    "translate(2%) scale(1.2) rotateX(47deg) rotateY(31deg) rotate(324deg)",
+                    "translate(-2%) scale(1.2) rotateX(47deg) rotateY(31deg) rotate(324deg)",
                   transformStyle: "preserve-3d",
                 }}
               >
@@ -599,7 +599,7 @@ function FeatureIllustration({ kind }: { kind: string }) {
         alt=""
         width={600}
         height={360}
-        className="h-full w-full object-cover opacity-80 invert"
+        className="h-full w-full object-cover opacity-95 invert"
       />
     );
   }
@@ -611,7 +611,7 @@ function FeatureIllustration({ kind }: { kind: string }) {
         alt=""
         width={600}
         height={360}
-        className="h-full w-full object-cover opacity-80 invert"
+        className="h-full w-full object-cover opacity-95 invert"
       />
     );
   }
@@ -625,7 +625,7 @@ function FeatureIllustration({ kind }: { kind: string }) {
           style={{
             left: `${16 + item * 16}%`,
             transform: "skewY(-28deg)",
-            opacity: 0.45 - item * 0.05,
+            opacity: 0.62 - item * 0.07,
           }}
         />
       ))}
@@ -787,8 +787,8 @@ function SignupSection() {
 
 function Footer() {
   return (
-    <footer className="border-t border-zinc-800 bg-[#09090b] px-6 pb-12 pt-4">
-      <div className="mx-auto flex max-w-5xl flex-col gap-5 text-sm text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
+    <footer className="border-t border-zinc-800 bg-[#09090b] px-6 py-6">
+      <div className="mx-auto flex min-h-14 max-w-5xl flex-col items-center justify-center gap-4 text-center text-sm text-zinc-600 sm:flex-row sm:justify-between sm:text-right">
         <Image
           src="/favicon.png"
           alt="SimOne"
