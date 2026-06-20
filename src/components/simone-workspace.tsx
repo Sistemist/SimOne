@@ -39,6 +39,7 @@ import {
   engines,
   loadVenture,
   saveVenture,
+  updateSprintZeroItemStatus,
 } from "@/lib/simone-model";
 import { summarizeSprintZeroReadiness } from "@/lib/sprint-zero-readiness";
 import { createVentureExport, ventureExportFilename } from "@/lib/venture-transfer";
@@ -497,6 +498,41 @@ function ListEditor({
                 </select>
               </label>
             </div>
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-900 pt-3">
+              <span
+                className={`rounded-md border px-2 py-1 text-xs ${evidenceStatusClass(item.status)}`}
+              >
+                {evidenceStatusLabel(item.status)}
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {item.status !== "testing" ? (
+                  <button
+                    type="button"
+                    onClick={() => onChange(updateSprintZeroItemStatus(items, item.id, "testing"))}
+                    className="rounded-lg border border-zinc-800 px-3 py-1.5 text-sm text-zinc-300 transition hover:border-[#7170ff]/60 hover:text-white"
+                  >
+                    Start test
+                  </button>
+                ) : null}
+                {item.status !== "resolved" ? (
+                  <button
+                    type="button"
+                    onClick={() => onChange(updateSprintZeroItemStatus(items, item.id, "resolved"))}
+                    className="rounded-lg border border-emerald-500/30 px-3 py-1.5 text-sm text-emerald-200 transition hover:border-emerald-400/70 hover:text-white"
+                  >
+                    Resolve
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => onChange(updateSprintZeroItemStatus(items, item.id, "draft"))}
+                    className="rounded-lg border border-zinc-800 px-3 py-1.5 text-sm text-zinc-300 transition hover:border-zinc-600 hover:text-white"
+                  >
+                    Reopen
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -519,6 +555,18 @@ function ListEditor({
       </button>
     </section>
   );
+}
+
+function evidenceStatusLabel(status: SprintZeroItem["status"]) {
+  if (status === "testing") return "Testing";
+  if (status === "resolved") return "Resolved";
+  return "Draft";
+}
+
+function evidenceStatusClass(status: SprintZeroItem["status"]) {
+  if (status === "testing") return "border-[#7170ff]/40 text-[#b8b7ff]";
+  if (status === "resolved") return "border-emerald-500/30 text-emerald-300";
+  return "border-zinc-800 text-zinc-500";
 }
 
 function SimCanvas({

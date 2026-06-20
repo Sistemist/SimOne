@@ -42,7 +42,7 @@ the app dashboard rather than cloning Paperclip or starting from a generic dashb
 | `SYS-157` | Foundation | Persist early-access leads outside Web3Forms retention | Merged to main |
 | `SYS-150` | SIM Workbench | Build venture onboarding | In progress locally |
 | `SYS-151` | SIM Workbench | Build engine and driver editor | Next-action review in progress |
-| `SYS-152` | SIM Workbench | Build Sprint Zero assumptions and decision gates | Evidence review in progress |
+| `SYS-152` | SIM Workbench | Build Sprint Zero assumptions and decision gates | Evidence actions in progress |
 | `SYS-153` | AI/RAG Layer | Clone Sysdom Knowledge into SimOne Knowledge | Backlog |
 | `SYS-154` | AI/RAG Layer | Create SimOne Operational knowledge base | In progress locally |
 | `SYS-155` | AI/RAG Layer | Add BYOK/OpenRouter provider settings | Backlog |
@@ -126,6 +126,10 @@ the app dashboard rather than cloning Paperclip or starting from a generic dashb
   - Guards `SYS-152` and makes assumptions/gates visible in the review.
 - `removeVentureById removes one venture without mutating the rest`
   - Guards `SYS-147` and local workspace management.
+- `updateSprintZeroItemStatus changes one evidence item without mutating the list`
+  - Guards `SYS-152` and keeps assumption/gate evidence actions predictable.
+- `updateSprintZeroItemStatus ignores missing evidence items`
+  - Guards `SYS-152` and prevents accidental evidence-row mutation.
 
 ## Launch Risks
 
@@ -147,3 +151,4 @@ the app dashboard rather than cloning Paperclip or starting from a generic dashb
 - Sprint Zero review now summarizes mapping completion and the next missing engine/driver fields.
 - `/app` now acts as a small local workspace hub with recent ventures, open, and delete controls.
 - The Sprint Zero review now recommends the next SIM surface to open and counts unresolved evidence.
+- Assumptions and decision gates now have direct Start test, Resolve, and Reopen actions.

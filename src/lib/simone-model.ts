@@ -268,6 +268,14 @@ export function removeVentureById(ventures: SimOneVenture[], ventureId: string) 
   return ventures.filter((venture) => venture.id !== ventureId);
 }
 
+export function updateSprintZeroItemStatus(
+  items: SprintZeroItem[],
+  itemId: string,
+  status: SprintZeroItem["status"],
+) {
+  return items.map((item) => (item.id === itemId ? { ...item, status } : item));
+}
+
 export function deleteVenture(ventureId: string) {
   saveVentures(removeVentureById(loadVentures(), ventureId));
 }

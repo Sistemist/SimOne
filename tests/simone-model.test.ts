@@ -8,6 +8,7 @@ import {
   engines,
   getWorkspaceEntryPath,
   removeVentureById,
+  updateSprintZeroItemStatus,
 } from "../src/lib/simone-model.ts";
 
 test("getWorkspaceEntryPath sends an empty alpha workspace to onboarding", () => {
@@ -36,6 +37,23 @@ test("removeVentureById removes one venture without mutating the rest", () => {
 
   assert.deepEqual(removeVentureById([first, second], first.id), [second]);
   assert.deepEqual(removeVentureById([first, second], "missing"), [first, second]);
+});
+
+test("updateSprintZeroItemStatus changes one evidence item without mutating the list", () => {
+  const venture = createSampleVenture();
+  const target = venture.assumptions[0];
+
+  const next = updateSprintZeroItemStatus(venture.assumptions, target.id, "testing");
+
+  assert.equal(next[0].status, "testing");
+  assert.equal(next[1].status, venture.assumptions[1].status);
+  assert.equal(venture.assumptions[0].status, "draft");
+});
+
+test("updateSprintZeroItemStatus ignores missing evidence items", () => {
+  const venture = createSampleVenture();
+
+  assert.deepEqual(updateSprintZeroItemStatus(venture.decisionGates, "missing", "resolved"), venture.decisionGates);
 });
 
 test("createVenture maps all four engines and all four drivers for Sprint Zero", () => {
