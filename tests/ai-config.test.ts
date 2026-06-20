@@ -59,6 +59,25 @@ test("getAiConfigStatusFromEnv can reuse the SimOne knowledge variable in shared
   assert.equal(status.label, "Shared existing knowledge");
 });
 
+test("getAiConfigStatusFromEnv accepts existing Tissuu Dify variable names", () => {
+  const status = getAiConfigStatusFromEnv({
+    DIFY_KB_API_KEY: "kb-key",
+    DIFY_API_URL: "https://dify.tissuu.ai/v1",
+    DIFY_KNOWLEDGE_MODE: "shared",
+    DIFY_DATASET_ID: "shared-dataset",
+  }).dify;
+
+  assert.equal(status.ready, true);
+  assert.deepEqual(status.missing, []);
+  assert.equal(status.knowledgeIdKey, "DIFY_DATASET_ID");
+});
+
+test("getAiConfigStatusFromEnv reports SimOne names when no Dify aliases exist", () => {
+  const status = getAiConfigStatusFromEnv({ DIFY_KNOWLEDGE_MODE: "shared" }).dify;
+
+  assert.deepEqual(status.missing, ["DIFY_API_KEY", "DIFY_BASE_URL", "DIFY_SHARED_KNOWLEDGE_ID"]);
+});
+
 test("getAiConfigStatusFromEnv reports OpenRouter and Neon readiness without secrets", () => {
   const status = getAiConfigStatusFromEnv({
     DATABASE_URL: "postgres://example",

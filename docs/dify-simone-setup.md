@@ -54,3 +54,25 @@ DIFY_SHARED_KNOWLEDGE_ID=...
 DIFY_KNOWLEDGE_MODE=dedicated
 DIFY_SIM_KNOWLEDGE_ID=...
 ```
+
+The Dify API key and the Dify knowledge ID are different things:
+
+- `DIFY_API_KEY` authenticates SimOne to Dify.
+- `DIFY_SHARED_KNOWLEDGE_ID` identifies the shared Dify knowledge/dataset SimOne should retrieve from.
+
+If reusing the current Tissuu setup, SimOne also accepts the existing Tissuu variable names:
+
+```bash
+DIFY_API_URL=https://dify.tissuu.ai/v1
+DIFY_KB_API_KEY=...
+DIFY_DATASET_ID=...
+```
+
+Use either the preferred SimOne names or the existing Tissuu aliases; do not commit either set of
+values. In Vercel, add them under the existing `simone` project at Project Settings -> Environment
+Variables and scope them to Production, Preview, and Development unless a narrower scope is needed.
+
+To find the shared knowledge ID, open the existing Sysdom/Tissuu knowledge base in Dify and copy the
+dataset/knowledge ID from its URL or dataset details. If the UI does not expose it cleanly, retrieve
+it from the self-hosted Dify admin/API or database on KVM2. The local Tissuu project currently shows
+app/API keys, but not enough safe local evidence to confirm the dataset ID without querying Dify.

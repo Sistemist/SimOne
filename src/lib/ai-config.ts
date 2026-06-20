@@ -37,8 +37,11 @@ function checkRequired(env: EnvLike, keys: string[]): ConfigCheck {
 function checkDify(env: EnvLike): DifyConfigCheck {
   const mode = env.DIFY_KNOWLEDGE_MODE?.trim().toLowerCase() === "shared" ? "shared" : "dedicated";
   const knowledgeIdKey = getDifyKnowledgeIdKey(env, mode);
+  const apiKeyReady = hasAny(env, ["DIFY_API_KEY", "DIFY_KB_API_KEY"]);
+  const baseUrlReady = hasAny(env, ["DIFY_BASE_URL", "DIFY_API_URL"]);
   const missing = [
-    ...["DIFY_API_KEY", "DIFY_BASE_URL"].filter((key) => !env[key]?.trim()),
+    ...(apiKeyReady ? [] : ["DIFY_API_KEY"]),
+    ...(baseUrlReady ? [] : ["DIFY_BASE_URL"]),
     ...(knowledgeIdKey ? [] : [mode === "shared" ? "DIFY_SHARED_KNOWLEDGE_ID" : "DIFY_SIM_KNOWLEDGE_ID"]),
   ];
 
@@ -53,7 +56,12 @@ function checkDify(env: EnvLike): DifyConfigCheck {
 
 function getDifyKnowledgeIdKey(env: EnvLike, mode: DifyConfigCheck["mode"]) {
   if (mode === "shared" && env.DIFY_SHARED_KNOWLEDGE_ID?.trim()) return "DIFY_SHARED_KNOWLEDGE_ID";
+  if (mode === "shared" && env.DIFY_DATASET_ID?.trim()) return "DIFY_DATASET_ID";
   if (env.DIFY_SIM_KNOWLEDGE_ID?.trim()) return "DIFY_SIM_KNOWLEDGE_ID";
 
   return null;
+}
+
+function hasAny(env: EnvLike, keys: string[]) {
+  return keys.some((key) => env[key]?.trim());
 }

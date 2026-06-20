@@ -112,6 +112,10 @@ the app dashboard rather than cloning Paperclip or starting from a generic dashb
   - Guards `SYS-153` and permits reuse of the existing Tissuu/Sysdom knowledge base.
 - `getAiConfigStatusFromEnv can reuse the SimOne knowledge variable in shared mode`
   - Guards `SYS-153` and keeps the alpha env path flexible before cloning.
+- `getAiConfigStatusFromEnv accepts existing Tissuu Dify variable names`
+  - Guards `SYS-153` and lets SimOne reuse the current shared Dify knowledge settings during alpha.
+- `getAiConfigStatusFromEnv reports SimOne names when no Dify aliases exist`
+  - Guards `SYS-153` and keeps Vercel setup guidance explicit for a fresh SimOne deployment.
 - `getAiConfigStatusFromEnv reports OpenRouter and Neon readiness without secrets`
   - Guards `SYS-148` and `SYS-155`.
 - `normalizeProviderSettings defaults OpenRouter BYOK fields`
