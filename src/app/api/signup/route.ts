@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { saveEarlyAccessLead } from "@/lib/db/leads";
+import {
+  SignupPayload,
+  normalizeSignupPayload,
+  parseWeb3FormsResponse,
+  type NormalizedSignup,
+} from "@/lib/signup";
 
-type SignupPayload = {
-  email?: string;
-  name?: string;
-  useCase?: string;
-  source?: string;
-};
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   let payload: SignupPayload;
@@ -18,52 +19,68 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Invalid signup request." }, { status: 400 });
   }
 
-  const email = String(payload.email || "").trim().toLowerCase();
-  const name = String(payload.name || "").trim();
-  const useCase = String(payload.useCase || "").trim();
-  const source = String(payload.source || "simone-landing").trim();
+  const normalized = normalizeSignupPayload(payload);
 
-  if (!emailPattern.test(email)) {
-    return NextResponse.json({ message: "Please enter a valid email address." }, { status: 400 });
+  if (!normalized.ok) {
+    return NextResponse.json({ message: normalized.message }, { status: 400 });
   }
 
+  const lead = normalized.value;
   const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
+  const databaseUrl = process.env.DATABASE_URL;
 
-  if (!accessKey) {
+  if (!databaseUrl) {
     return NextResponse.json(
-      { message: "Signup service is not configured yet." },
+      { message: "Signup storage is not configured yet." },
       { status: 500 },
     );
   }
 
-  const web3FormsResponse = await fetch("https://api.web3forms.com/submit", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      access_key: accessKey,
-      subject: "SimOne Early Access Signup",
-      from_name: "SimOne Site",
-      email,
-      name,
-      use_case: useCase,
-      source,
-    }),
-  });
+  let notificationStatus: "pending" | "sent" | "failed" = accessKey ? "pending" : "failed";
 
-  const result = (await web3FormsResponse.json()) as {
-    success?: boolean;
-    message?: string;
-  };
+  try {
+    if (accessKey) {
+      notificationStatus = await notifyWeb3Forms(accessKey, lead);
+    }
 
-  if (!web3FormsResponse.ok || !result.success) {
+    await saveEarlyAccessLead(lead, notificationStatus);
+
+    return NextResponse.json({ message: "Joined early access." });
+  } catch {
     return NextResponse.json(
-      { message: result.message || "Signup service rejected the request." },
+      { message: "Signup could not be saved. Please try again." },
       { status: 502 },
     );
   }
+}
 
-  return NextResponse.json({ message: "Joined early access." });
+async function notifyWeb3Forms(
+  accessKey: string,
+  lead: NormalizedSignup,
+): Promise<"sent" | "failed"> {
+  try {
+    const web3FormsResponse = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        access_key: accessKey,
+        subject: "SimOne Early Access Signup",
+        from_name: "SimOne Site",
+        email: lead.email,
+        name: lead.name,
+        use_case: lead.useCase,
+        source: lead.source,
+      }),
+    });
+
+    const text = await web3FormsResponse.text();
+    const result = parseWeb3FormsResponse(text);
+
+    return web3FormsResponse.ok && result.success ? "sent" : "failed";
+  } catch {
+    return "failed";
+  }
 }

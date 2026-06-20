@@ -26,15 +26,16 @@ export function SignupForm({ variant = "light" }: { variant?: "light" | "dark" }
     const formData = new FormData(form);
 
     try {
+      const body = {
+        email: String(formData.get("email") || ""),
+        name: String(formData.get("name") || ""),
+        useCase: String(formData.get("useCase") || ""),
+        source: "simone-landing",
+      };
       const response = await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: String(formData.get("email") || ""),
-          name: String(formData.get("name") || ""),
-          useCase: String(formData.get("useCase") || ""),
-          source: "simone-landing",
-        }),
+        body: JSON.stringify(body),
       });
 
       const payload = (await response.json()) as { message?: string };

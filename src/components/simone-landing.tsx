@@ -208,7 +208,7 @@ export function SimOneLanding() {
                   transformOrigin: "0 0",
                   backfaceVisibility: "hidden",
                   transform:
-                    "translate(2%) scale(1.2) rotateX(47deg) rotateY(31deg) rotate(324deg)",
+                    "translate(-2%) scale(1.2) rotateX(47deg) rotateY(31deg) rotate(324deg)",
                   transformStyle: "preserve-3d",
                 }}
               >
@@ -237,9 +237,10 @@ function Navbar() {
             <Image
               src="/simone-logo.png"
               alt="SimOne"
-              width={196}
-              height={56}
-              className="h-10 w-auto"
+              width={864}
+              height={322}
+              className="h-auto w-[112px] sm:w-[122px]"
+              style={{ height: "auto" }}
               priority
             />
           </a>
@@ -290,7 +291,14 @@ function DashboardMockup() {
       >
         <div className="border-b border-zinc-800/50 p-3">
           <div className="flex items-center gap-2 px-2 py-1.5">
-            <Image src="/simone-logo.png" alt="SimOne" width={116} height={32} className="h-5 w-auto" />
+            <Image
+              src="/simone-logo.png"
+              alt="SimOne"
+              width={864}
+              height={322}
+              className="h-auto w-[72px]"
+              style={{ height: "auto" }}
+            />
             <ChevronDown className="ml-auto h-3.5 w-3.5 text-zinc-500" aria-hidden="true" />
           </div>
         </div>
@@ -591,7 +599,7 @@ function FeatureIllustration({ kind }: { kind: string }) {
         alt=""
         width={600}
         height={360}
-        className="h-full w-full object-cover opacity-80 invert"
+        className="h-full w-full object-cover opacity-95 invert"
       />
     );
   }
@@ -603,7 +611,7 @@ function FeatureIllustration({ kind }: { kind: string }) {
         alt=""
         width={600}
         height={360}
-        className="h-full w-full object-cover opacity-80 invert"
+        className="h-full w-full object-cover opacity-95 invert"
       />
     );
   }
@@ -617,7 +625,7 @@ function FeatureIllustration({ kind }: { kind: string }) {
           style={{
             left: `${16 + item * 16}%`,
             transform: "skewY(-28deg)",
-            opacity: 0.45 - item * 0.05,
+            opacity: 0.62 - item * 0.07,
           }}
         />
       ))}
@@ -751,8 +759,8 @@ function RagSection() {
 
 function SignupSection() {
   return (
-    <section id="signup" className="relative z-20 bg-[#09090b] px-6 py-28">
-      <div className="mx-auto grid max-w-5xl items-start gap-10 border-y border-zinc-800 py-16 lg:grid-cols-[0.9fr_1.1fr]">
+    <section id="signup" className="relative z-20 bg-[#09090b] px-6 pb-16 pt-24">
+      <div className="mx-auto grid max-w-5xl items-start gap-10 border-t border-zinc-800 pt-14 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
           <h2 className="text-3xl font-medium text-white md:text-4xl lg:text-[42px]">
             Join the SimOne early access list.
@@ -779,14 +787,14 @@ function SignupSection() {
 
 function Footer() {
   return (
-    <footer className="border-t border-zinc-800 bg-[#09090b] px-6 py-12">
-      <div className="mx-auto flex max-w-5xl flex-col gap-5 text-sm text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
+    <footer className="border-t border-zinc-800 bg-[#09090b] px-6 py-6">
+      <div className="mx-auto flex min-h-14 max-w-5xl flex-col items-center justify-center gap-4 text-center text-sm text-zinc-600 sm:flex-row sm:justify-between sm:text-right">
         <Image
-          src="/simone-logo.png"
+          src="/favicon.png"
           alt="SimOne"
-          width={864}
-          height={322}
-          className="h-auto w-[132px] opacity-85 sm:w-[164px]"
+          width={1000}
+          height={1000}
+          className="h-7 w-7 opacity-85"
         />
         <div className="space-y-1 sm:text-right">
           <p>Systems Intelligence for agent-native builders.</p>
