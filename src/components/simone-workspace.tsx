@@ -833,7 +833,13 @@ function AgentQueueCard({
 function ReadinessCard({ aiConfigStatus }: { aiConfigStatus?: AiConfigStatus }) {
   const status = aiConfigStatus || {
     neon: { ready: false, missing: ["DATABASE_URL"] },
-    dify: { ready: false, missing: ["DIFY_API_KEY", "DIFY_BASE_URL", "DIFY_SIM_KNOWLEDGE_ID"] },
+    dify: {
+      ready: false,
+      missing: ["DIFY_API_KEY", "DIFY_BASE_URL", "DIFY_SIM_KNOWLEDGE_ID"],
+      mode: "dedicated" as const,
+      knowledgeIdKey: null,
+      label: "Dedicated SimOne knowledge",
+    },
     openRouter: { ready: false, missing: ["OPENROUTER_API_KEY"] },
   };
   const [providerSettings, setProviderSettings] = useState(() => normalizeProviderSettings());
@@ -875,7 +881,7 @@ function ReadinessCard({ aiConfigStatus }: { aiConfigStatus?: AiConfigStatus }) 
       </div>
       <div className="mt-4 space-y-3">
         <ReadinessRow label="Neon" check={status.neon} />
-        <ReadinessRow label="Dify" check={status.dify} />
+        <ReadinessRow label="Dify" check={status.dify} detail={status.dify.label} />
         <ReadinessRow
           label="OpenRouter"
           check={{ ready: providerStatus.ready, missing: providerStatus.missing }}

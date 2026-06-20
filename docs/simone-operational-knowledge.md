@@ -53,6 +53,11 @@ Use `SimOne Knowledge` for canonical SIM/book/paper/course context.
 Use `SimOne Operational` for product behavior, workflow boundaries, prompt policies, and agent
 execution rules.
 
+For alpha, SimOne may reuse an existing shared Tissuu/Sysdom Dify knowledge base when cloning is
+operationally expensive. This is allowed only if retrieval remains scoped and SimOne-specific
+operational rules stay in a separate source. Split into a dedicated SimOne corpus when retrieval
+noise, product-specific agent context, or audit/ownership boundaries require it.
+
 If retrieved context conflicts with explicit human instruction, stop and ask for clarification.
 
 ## Sprint Zero Workflow

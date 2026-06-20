@@ -43,7 +43,7 @@ the app dashboard rather than cloning Paperclip or starting from a generic dashb
 | `SYS-150` | SIM Workbench | Build venture onboarding | In progress locally |
 | `SYS-151` | SIM Workbench | Build engine and driver editor | Next-action review in progress |
 | `SYS-152` | SIM Workbench | Build Sprint Zero assumptions and decision gates | Evidence actions in progress |
-| `SYS-153` | AI/RAG Layer | Clone Sysdom Knowledge into SimOne Knowledge | Backlog |
+| `SYS-153` | AI/RAG Layer | Configure Dify knowledge source mode | Shared mode shipped |
 | `SYS-154` | AI/RAG Layer | Create SimOne Operational knowledge base | In progress locally |
 | `SYS-155` | AI/RAG Layer | Add BYOK/OpenRouter provider settings | Local BYOK shipped |
 | `SYS-156` | Course Alpha | Run visual QA and seed sample ventures | In progress locally |
@@ -108,6 +108,10 @@ the app dashboard rather than cloning Paperclip or starting from a generic dashb
   - Guards `SYS-148` and `SYS-154`.
 - `getAiConfigStatusFromEnv marks Dify ready only when all retrieval settings exist`
   - Guards `SYS-153`, `SYS-154`, and `SYS-155`.
+- `getAiConfigStatusFromEnv allows shared Dify knowledge for alpha`
+  - Guards `SYS-153` and permits reuse of the existing Tissuu/Sysdom knowledge base.
+- `getAiConfigStatusFromEnv can reuse the SimOne knowledge variable in shared mode`
+  - Guards `SYS-153` and keeps the alpha env path flexible before cloning.
 - `getAiConfigStatusFromEnv reports OpenRouter and Neon readiness without secrets`
   - Guards `SYS-148` and `SYS-155`.
 - `normalizeProviderSettings defaults OpenRouter BYOK fields`
@@ -146,6 +150,8 @@ the app dashboard rather than cloning Paperclip or starting from a generic dashb
 - Web3Forms Free stores submissions for only 30 days, so leads must be persisted somewhere we
   control before public traffic increases.
 - Dify corpus duplication needs testing so retrieval does not mix PDFs/Markdown noisily.
+- Dify cloning is deferred for alpha; shared knowledge is acceptable while retrieval is scoped and
+  operational SimOne rules remain separate.
 - BYOK provider settings must not imply bundled opaque model usage.
 - Cloud venture sync is account-gated and route-backed, but it intentionally stays local-only until
   `DATABASE_URL` is configured and migrations are applied.
