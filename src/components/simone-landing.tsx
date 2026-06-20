@@ -239,7 +239,7 @@ function Navbar() {
               alt="SimOne"
               width={864}
               height={322}
-              className="h-auto w-[124px] sm:w-[136px]"
+              className="h-auto w-[112px] sm:w-[122px]"
               style={{ height: "auto" }}
               priority
             />
@@ -787,14 +787,14 @@ function SignupSection() {
 
 function Footer() {
   return (
-    <footer className="bg-[#09090b] px-6 pb-12 pt-4">
+    <footer className="border-t border-zinc-800 bg-[#09090b] px-6 pb-12 pt-4">
       <div className="mx-auto flex max-w-5xl flex-col gap-5 text-sm text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
         <Image
           src="/favicon.png"
           alt="SimOne"
           width={1000}
           height={1000}
-          className="h-8 w-8 opacity-85"
+          className="h-7 w-7 opacity-85"
         />
         <div className="space-y-1 sm:text-right">
           <p>Systems Intelligence for agent-native builders.</p>
