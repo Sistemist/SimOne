@@ -36,13 +36,13 @@ the app dashboard rather than cloning Paperclip or starting from a generic dashb
 
 | ID | Milestone | Issue | Status |
 | --- | --- | --- | --- |
-| `SYS-147` | Foundation | Configure auth and alpha workspace routes | In progress locally |
-| `SYS-148` | Foundation | Add Neon/Drizzle schema for ventures and agent runs | In progress locally |
-| `SYS-149` | Foundation | Fix Web3Forms signup on free tier | Backlog |
-| `SYS-157` | Foundation | Persist early-access leads outside Web3Forms retention | In progress locally |
+| `SYS-147` | Foundation | Configure auth and alpha workspace routes | Merged to main |
+| `SYS-148` | Foundation | Add Neon/Drizzle schema for ventures and agent runs | Merged to main |
+| `SYS-149` | Foundation | Fix Web3Forms signup on free tier | Covered by server notification fallback |
+| `SYS-157` | Foundation | Persist early-access leads outside Web3Forms retention | Merged to main |
 | `SYS-150` | SIM Workbench | Build venture onboarding | In progress locally |
-| `SYS-151` | SIM Workbench | Build engine and driver editor | In progress locally |
-| `SYS-152` | SIM Workbench | Build Sprint Zero assumptions and decision gates | In progress locally |
+| `SYS-151` | SIM Workbench | Build engine and driver editor | Next-action review in progress |
+| `SYS-152` | SIM Workbench | Build Sprint Zero assumptions and decision gates | Evidence review in progress |
 | `SYS-153` | AI/RAG Layer | Clone Sysdom Knowledge into SimOne Knowledge | Backlog |
 | `SYS-154` | AI/RAG Layer | Create SimOne Operational knowledge base | In progress locally |
 | `SYS-155` | AI/RAG Layer | Add BYOK/OpenRouter provider settings | Backlog |
@@ -120,6 +120,10 @@ the app dashboard rather than cloning Paperclip or starting from a generic dashb
   - Guards `SYS-151`, `SYS-152`, and `SYS-156`.
 - `summarizeSprintZeroReadiness counts completed engine and driver specs`
   - Guards `SYS-151`, `SYS-152`, and `SYS-156`.
+- `summarizeSprintZeroReadiness recommends the next unmapped SIM surface`
+  - Guards `SYS-151`, `SYS-152`, and the guided workbench loop.
+- `summarizeSprintZeroReadiness counts unresolved Sprint Zero evidence`
+  - Guards `SYS-152` and makes assumptions/gates visible in the review.
 - `removeVentureById removes one venture without mutating the rest`
   - Guards `SYS-147` and local workspace management.
 
@@ -142,3 +146,4 @@ the app dashboard rather than cloning Paperclip or starting from a generic dashb
 - Import/export is available for local course/demo portability before cloud sync is configured.
 - Sprint Zero review now summarizes mapping completion and the next missing engine/driver fields.
 - `/app` now acts as a small local workspace hub with recent ventures, open, and delete controls.
+- The Sprint Zero review now recommends the next SIM surface to open and counts unresolved evidence.

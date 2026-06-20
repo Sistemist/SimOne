@@ -27,3 +27,28 @@ test("summarizeSprintZeroReadiness counts completed engine and driver specs", ()
   assert.equal(summary.totalComponents, 8);
   assert.ok(summary.nextGaps.some((gap) => /Cash/i.test(gap)));
 });
+
+test("summarizeSprintZeroReadiness recommends the next unmapped SIM surface", () => {
+  const summary = summarizeSprintZeroReadiness(createSampleVenture());
+
+  assert.deepEqual(summary.recommendedSection, {
+    key: "cash",
+    label: "Cash",
+    missingField: "inputs",
+    reason: "Cash needs inputs before Sprint Zero can judge the system loop.",
+  });
+});
+
+test("summarizeSprintZeroReadiness counts unresolved Sprint Zero evidence", () => {
+  const venture = createSampleVenture();
+  venture.assumptions[0].status = "testing";
+  venture.assumptions[1].status = "resolved";
+  venture.decisionGates[0].status = "resolved";
+
+  const summary = summarizeSprintZeroReadiness(venture);
+
+  assert.equal(summary.assumptionsTesting, 1);
+  assert.equal(summary.assumptionsResolved, 1);
+  assert.equal(summary.decisionGatesResolved, 1);
+  assert.equal(summary.unresolvedEvidenceCount, 4);
+});

@@ -265,7 +265,9 @@ export function SimOneWorkspace({
             </section>
             <aside className="space-y-6">
               <SimCanvas active={active} setActive={setActive} />
-              {readiness ? <SprintZeroReviewCard readiness={readiness} /> : null}
+              {readiness ? (
+                <SprintZeroReviewCard readiness={readiness} setActive={setActive} />
+              ) : null}
               <AgentBoundaryCard />
               <AgentQueueCard
                 active={active}
@@ -591,8 +593,10 @@ function AgentBoundaryCard() {
 
 function SprintZeroReviewCard({
   readiness,
+  setActive,
 }: {
   readiness: ReturnType<typeof summarizeSprintZeroReadiness>;
+  setActive: (key: SectionKey) => void;
 }) {
   return (
     <section className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-5">
@@ -612,6 +616,42 @@ function SprintZeroReviewCard({
         />
       </div>
       <div className="mt-3 text-sm text-zinc-400">{readiness.percent}% mapped</div>
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <ReviewStat label="Testing" value={readiness.assumptionsTesting} />
+        <ReviewStat label="Resolved" value={readiness.assumptionsResolved + readiness.decisionGatesResolved} />
+        <ReviewStat label="Open" value={readiness.unresolvedEvidenceCount} />
+      </div>
+      {readiness.recommendedSection ? (
+        <button
+          type="button"
+          onClick={() => setActive(readiness.recommendedSection?.key || "product")}
+          className="mt-4 flex w-full items-center justify-between gap-3 rounded-xl border border-[#7170ff]/40 bg-[#7170ff]/10 p-3 text-left transition hover:border-[#8f8dff] hover:bg-[#7170ff]/15"
+        >
+          <span>
+            <span className="block text-sm font-medium text-white">
+              Open {readiness.recommendedSection.label}
+            </span>
+            <span className="mt-1 block text-xs leading-5 text-zinc-400">
+              {readiness.recommendedSection.reason}
+            </span>
+          </span>
+          <ChevronRight size={18} className="shrink-0 text-[#9f9dff]" aria-hidden="true" />
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setActive("coherence")}
+          className="mt-4 flex w-full items-center justify-between gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-left transition hover:border-emerald-400/60"
+        >
+          <span>
+            <span className="block text-sm font-medium text-white">Open coherence review</span>
+            <span className="mt-1 block text-xs leading-5 text-zinc-400">
+              All engine and driver fields are mapped.
+            </span>
+          </span>
+          <ChevronRight size={18} className="shrink-0 text-emerald-300" aria-hidden="true" />
+        </button>
+      )}
       {readiness.nextGaps.length ? (
         <ul className="mt-4 space-y-2">
           {readiness.nextGaps.map((gap) => (
@@ -622,6 +662,15 @@ function SprintZeroReviewCard({
         </ul>
       ) : null}
     </section>
+  );
+}
+
+function ReviewStat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-lg border border-zinc-800 bg-[#09090b] px-3 py-2">
+      <div className="text-lg font-semibold text-white">{value}</div>
+      <div className="mt-0.5 text-xs text-zinc-500">{label}</div>
+    </div>
   );
 }
 
