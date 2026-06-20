@@ -13,6 +13,7 @@ import {
   CircleAlert,
   Download,
   GitBranch,
+  KeyRound,
   Layers3,
   Orbit,
   Radio,
@@ -41,6 +42,14 @@ import {
   saveVenture,
   updateSprintZeroItemStatus,
 } from "@/lib/simone-model";
+import {
+  clearProviderSettings,
+  getProviderSettingsStatus,
+  loadProviderSettings,
+  maskProviderKey,
+  normalizeProviderSettings,
+  saveProviderSettings,
+} from "@/lib/provider-settings";
 import { summarizeSprintZeroReadiness } from "@/lib/sprint-zero-readiness";
 import { createVentureExport, ventureExportFilename } from "@/lib/venture-transfer";
 
@@ -827,6 +836,36 @@ function ReadinessCard({ aiConfigStatus }: { aiConfigStatus?: AiConfigStatus }) 
     dify: { ready: false, missing: ["DIFY_API_KEY", "DIFY_BASE_URL", "DIFY_SIM_KNOWLEDGE_ID"] },
     openRouter: { ready: false, missing: ["OPENROUTER_API_KEY"] },
   };
+  const [providerSettings, setProviderSettings] = useState(() => normalizeProviderSettings());
+  const [savedProviderSettings, setSavedProviderSettings] = useState(() => normalizeProviderSettings());
+  const [providerSaved, setProviderSaved] = useState(false);
+  const providerStatus = getProviderSettingsStatus(status.openRouter, savedProviderSettings);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      const loaded = loadProviderSettings();
+      setProviderSettings(loaded);
+      setSavedProviderSettings(loaded);
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  function saveLocalProviderSettings() {
+    const normalized = normalizeProviderSettings(providerSettings);
+    saveProviderSettings(normalized);
+    setProviderSettings(normalized);
+    setSavedProviderSettings(normalized);
+    setProviderSaved(true);
+    window.setTimeout(() => setProviderSaved(false), 1200);
+  }
+
+  function clearLocalProviderSettings() {
+    clearProviderSettings();
+    const empty = normalizeProviderSettings();
+    setProviderSettings(empty);
+    setSavedProviderSettings(empty);
+  }
 
   return (
     <section className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-5">
@@ -837,7 +876,78 @@ function ReadinessCard({ aiConfigStatus }: { aiConfigStatus?: AiConfigStatus }) 
       <div className="mt-4 space-y-3">
         <ReadinessRow label="Neon" check={status.neon} />
         <ReadinessRow label="Dify" check={status.dify} />
-        <ReadinessRow label="OpenRouter" check={status.openRouter} />
+        <ReadinessRow
+          label="OpenRouter"
+          check={{ ready: providerStatus.ready, missing: providerStatus.missing }}
+          detail={providerStatus.label}
+        />
+      </div>
+      <div className="mt-4 rounded-xl border border-zinc-800 bg-[#09090b] p-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm font-medium text-zinc-200">
+            <KeyRound size={15} className="text-[#7170ff]" />
+            OpenRouter BYOK
+          </div>
+          <span className="rounded-md border border-zinc-800 px-2 py-1 text-xs text-zinc-500">
+            {maskProviderKey(savedProviderSettings.apiKey) || "Not saved"}
+          </span>
+        </div>
+        <div className="mt-3 space-y-3">
+          <label className="block">
+            <span className="text-xs uppercase tracking-[0.16em] text-zinc-600">API key</span>
+            <input
+              type="password"
+              value={providerSettings.apiKey}
+              onChange={(event) =>
+                setProviderSettings({ ...providerSettings, apiKey: event.target.value })
+              }
+              className="mt-2 h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-200 outline-none transition placeholder:text-zinc-600 focus:border-zinc-600"
+              placeholder="sk-or-..."
+              autoComplete="off"
+            />
+          </label>
+          <label className="block">
+            <span className="text-xs uppercase tracking-[0.16em] text-zinc-600">Model</span>
+            <input
+              value={providerSettings.model}
+              onChange={(event) =>
+                setProviderSettings({ ...providerSettings, model: event.target.value })
+              }
+              className="mt-2 h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-200 outline-none transition placeholder:text-zinc-600 focus:border-zinc-600"
+              placeholder="openrouter/auto"
+            />
+          </label>
+          <label className="block">
+            <span className="text-xs uppercase tracking-[0.16em] text-zinc-600">Base URL</span>
+            <input
+              value={providerSettings.baseUrl}
+              onChange={(event) =>
+                setProviderSettings({ ...providerSettings, baseUrl: event.target.value })
+              }
+              className="mt-2 h-10 w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-200 outline-none transition placeholder:text-zinc-600 focus:border-zinc-600"
+              placeholder="https://openrouter.ai/api/v1"
+            />
+          </label>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+          <span className="text-xs text-zinc-500">Stored in this browser only.</span>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={clearLocalProviderSettings}
+              className="rounded-lg border border-zinc-800 px-3 py-1.5 text-sm text-zinc-400 transition hover:border-zinc-600 hover:text-white"
+            >
+              Clear
+            </button>
+            <button
+              type="button"
+              onClick={saveLocalProviderSettings}
+              className="rounded-lg border border-[#7170ff]/50 px-3 py-1.5 text-sm text-zinc-100 transition hover:border-[#9b99ff]"
+            >
+              {providerSaved ? "Saved" : "Save"}
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -846,9 +956,11 @@ function ReadinessCard({ aiConfigStatus }: { aiConfigStatus?: AiConfigStatus }) 
 function ReadinessRow({
   label,
   check,
+  detail,
 }: {
   label: string;
   check: { ready: boolean; missing: string[] };
+  detail?: string;
 }) {
   return (
     <div className="rounded-xl border border-zinc-800 bg-[#09090b] p-3">
@@ -864,6 +976,7 @@ function ReadinessRow({
           {check.ready ? "Ready" : "Needs config"}
         </span>
       </div>
+      {detail ? <p className="mt-2 text-xs leading-5 text-zinc-500">{detail}</p> : null}
       {!check.ready ? (
         <p className="mt-2 text-xs leading-5 text-zinc-500">{check.missing.join(", ")}</p>
       ) : null}

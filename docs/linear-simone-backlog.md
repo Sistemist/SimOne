@@ -45,7 +45,7 @@ the app dashboard rather than cloning Paperclip or starting from a generic dashb
 | `SYS-152` | SIM Workbench | Build Sprint Zero assumptions and decision gates | Evidence actions in progress |
 | `SYS-153` | AI/RAG Layer | Clone Sysdom Knowledge into SimOne Knowledge | Backlog |
 | `SYS-154` | AI/RAG Layer | Create SimOne Operational knowledge base | In progress locally |
-| `SYS-155` | AI/RAG Layer | Add BYOK/OpenRouter provider settings | Backlog |
+| `SYS-155` | AI/RAG Layer | Add BYOK/OpenRouter provider settings | Local BYOK shipped |
 | `SYS-156` | Course Alpha | Run visual QA and seed sample ventures | In progress locally |
 
 ## Acceptance Tests In Repo
@@ -110,6 +110,16 @@ the app dashboard rather than cloning Paperclip or starting from a generic dashb
   - Guards `SYS-153`, `SYS-154`, and `SYS-155`.
 - `getAiConfigStatusFromEnv reports OpenRouter and Neon readiness without secrets`
   - Guards `SYS-148` and `SYS-155`.
+- `normalizeProviderSettings defaults OpenRouter BYOK fields`
+  - Guards `SYS-155`.
+- `getProviderSettingsStatus prefers server readiness without exposing secrets`
+  - Guards `SYS-155`.
+- `getProviderSettingsStatus accepts local BYOK when server env is missing`
+  - Guards `SYS-155` and alpha-local provider setup.
+- `getProviderSettingsStatus reports missing provider config`
+  - Guards `SYS-155`.
+- `maskProviderKey keeps only a short safe preview`
+  - Guards `SYS-155` and prevents visible full-key disclosure.
 - `createVentureExport wraps a venture with versioned metadata`
   - Guards `SYS-156` and course/demo portability.
 - `parseVentureExport accepts a serialized venture export`
@@ -152,3 +162,4 @@ the app dashboard rather than cloning Paperclip or starting from a generic dashb
 - `/app` now acts as a small local workspace hub with recent ventures, open, and delete controls.
 - The Sprint Zero review now recommends the next SIM surface to open and counts unresolved evidence.
 - Assumptions and decision gates now have direct Start test, Resolve, and Reopen actions.
+- OpenRouter BYOK settings can now be saved locally in the browser and reflected in readiness.
